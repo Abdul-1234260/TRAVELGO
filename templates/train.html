@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Search Trains - TravelGo</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        body {
+    /* Font and background */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(to right, #6a11cb 0%, #2575fc 100%); /* Blue to Purple gradient */
+    color: #333;
+    margin: 0;
+    padding: 0;
+    /* Flexbox for full page layout */
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+header {
+    /* Header styling */
+    background-color: #ffffff;
+    padding: 15px 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    /* Flexbox for content alignment within header */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap; /* Allow wrapping on smaller screens */
+}
+
+header h1 {
+    /* TravelGo title styling */
+    color: #2575fc;
+    margin: 0;
+    font-size: 1.8em;
+    font-weight: 700;
+}
+
+header nav a {
+    /* Navigation links styling */
+    color: #2575fc;
+    text-decoration: none;
+    margin-left: 20px;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+header nav a:hover {
+    /* Navigation link hover effect */
+    color: #6a11cb;
+}
+
+.search-container {
+    /* Main search form container */
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    padding: 30px;
+    margin: 40px auto 20px auto; /* Center block with auto margins */
+    max-width: 90%;
+    width: 900px;
+    box-sizing: border-box;
+    animation: fadeIn 0.8s ease-out; /* Fade-in animation */
+}
+
+.search-container h2 {
+    /* Search section heading */
+    color: #2575fc;
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 2em;
+    font-weight: 600;
+}
+
+.search-container h2 .fas {
+    /* FontAwesome icon within heading */
+    margin-right: 10px;
+    color: #6a11cb;
+}
+
+.form-row {
+    /* Grid layout for form fields */
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 20px; /* Space between grid items */
+    align-items: flex-end; /* Aligns items to the bottom, useful for labels/inputs */
+}
+
+.form-group {
+    /* Individual form group (label + input) */
+    margin-bottom: 0; /* Override Bootstrap's default margin-bottom */
+}
+
+.form-group label {
+    /* Label styling */
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #555;
+}
+
+.form-control {
+    /* Input and select common styling */
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ced4da;
+    border-radius: 8px;
+    font-size: 1em;
+    box-sizing: border-box; /* Ensures padding doesn't add to the width */
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-control:focus {
+    /* Input/select focus effect */
+    border-color: #2575fc;
+    box-shadow: 0 0 0 0.2rem rgba(37, 117, 252, 0.25);
+    outline: none;
+}
+
+#searchTrainBtn {
+    /* Search button styling */
+    background-color: #28a745; /* Green for search */
+    color: white;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1.1em;
+    font-weight: 600;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    width: 100%;
+    margin-top: 25px; /* Adjust margin for button in grid */
+}
+
+#searchTrainBtn:hover {
+    /* Search button hover effect */
+    background-color: #218838;
+    transform: translateY(-2px);
+}
+
+.results-container {
+    /* Train search results container */
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    padding: 30px;
+    margin: 20px auto 40px auto; /* Center block with auto margins */
+    max-width: 90%;
+    width: 900px;
+    box-sizing: border-box;
+    animation: fadeIn 0.8s ease-out; /* Fade-in animation */
+}
+
+.results-container h3 {
+    /* Results section heading */
+    color: #2575fc;
+    text-align: center;
+    margin-bottom: 25px;
+    font-size: 1.8em;
+    font-weight: 600;
+}
+
+.no-results {
+    /* Message for no search results */
+    text-align: center;
+    color: #666;
+    padding: 20px;
+    font-style: italic;
+}
+
+.train-card {
+    /* Individual train listing card */
+    background-color: #f8f9fa;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    padding: 20px;
+    display: flex; /* Flexbox for internal layout */
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    flex-wrap: wrap; /* Allow wrapping of content within card */
+}
+
+.train-card:hover {
+    /* Train card hover effect */
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.train-info {
+    /* Section for train details */
+    flex: 2; /* Takes more space in flex container */
+    min-width: 280px; /* Ensure info doesn't get too cramped */
+}
+
+.train-info h4 {
+    /* Train name heading */
+    color: #0056b3; /* Darker blue for train name */
+    margin-bottom: 10px;
+    font-size: 1.4em;
+    font-weight: 700;
+}
+
+.train-info p {
+    /* Train detail paragraphs */
+    margin: 5px 0;
+    color: #555;
+    font-size: 0.95em;
+}
+
+.train-info p strong {
+    /* Strong text within train details */
+    color: #333;
+}
+
+.train-price-book {
+    /* Section for price and book button */
+    flex: 1; /* Takes remaining space */
+    min-width: 150px; /* Ensure price/button don't get too cramped */
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px; /* Space between price and button */
+}
+
+.train-price {
+    /* Train price styling */
+    font-size: 1.8em;
+    font-weight: 700;
+    color: #dc3545; /* Red for price */
+}
+
+.book-btn {
+    /* Book button styling */
+    background-color: #007bff; /* Primary blue for book button */
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1em;
+    font-weight: 600;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.book-btn:hover {
+    /* Book button hover effect */
+    background-color: #0056b3;
+    transform: translateY(-2px);
+}
+
+footer {
+    /* Footer styling */
+    background-color: #333;
+    color: white;
+    text-align: center;
+    padding: 15px;
+    margin-top: auto; /* Pushes footer to the bottom */
+    font-size: 0.9em;
+}
+
+@keyframes fadeIn {
+    /* Keyframe animation for fade-in effect */
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* --- Responsive adjustments --- */
+@media (max-width: 768px) {
+    .search-container, .results-container {
+        margin-left: 15px;
+        margin-right: 15px;
+        padding: 20px;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr; /* Stack elements on small screens */
+    }
+
+    #searchTrainBtn {
+        margin-top: 15px;
+    }
+
+    .train-card {
+        flex-direction: column; /* Stack info and price/book on small screens */
+        align-items: flex-start;
+    }
+
+    .train-price-book {
+        width: 100%;
+        text-align: left;
+        align-items: flex-start;
+        margin-top: 15px;
+    }
+
+    .book-btn {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    header nav {
+        margin-top: 10px;
+    }
+    header nav a {
+        margin-left: 0;
+        margin-right: 15px;
+    }
+    .search-container h2 {
+        font-size: 1.6em;
+    }
+    .train-info h4 {
+        font-size: 1.2em;
+    }
+    .train-price {
+        font-size: 1.5em;
+    }
+}
+    </style>
+</head>
+<body>
+    <header>
+        <h1>TravelGo</h1>
+        <nav>
+            <a href="/">Home</a>
+            <a href="/dashboard">Dashboard</a>
+            <a href="/logout">Logout</a>
+        </nav>
+    </header>
+
+    <div class="search-container">
+        <h2><i class="fas fa-train"></i> Search & Book Trains</h2>
+        <div class="form-row">
+            <div class="form-group">
+                <label for="source">From</label>
+                <select id="source" class="form-control">
+                    <option value="">Select Source</option>
+                    <option value="Hyderabad">Hyderabad</option>
+                    <option value="Bengaluru">Bengaluru</option>
+                    <option value="Delhi">Delhi</option>
+                    <option value="Mumbai">Mumbai</option>
+                    <option value="Chennai">Chennai</option>
+                    <option value="Guntur">Guntur</option>
+                    <option value="Vijayawada">Vijayawada</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="destination">To</label>
+                <select id="destination" class="form-control">
+                    <option value="">Select Destination</option>
+                    <option value="Bengaluru">Bengaluru</option>
+                    <option value="Hyderabad">Hyderabad</option>
+                    <option value="Delhi">Delhi</option>
+                    <option value="Mumbai">Mumbai</option>
+                    <option value="Chennai">Chennai</option>
+                    <option value="Guntur">Guntur</option>
+                    <option value="Vijayawada">Vijayawada</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="date">Date</label>
+                <input type="date" id="date" class="form-control">
+            </div>
+            <div class="form-group">
+                <label for="num_persons">Passengers</label>
+                <input type="number" id="num_persons" class="form-control" min="1" value="1">
+            </div>
+            <div class="form-group">
+                <label for="train_type">Type</label>
+                <select id="train_type" class="form-control">
+                    <option value="All">All (AC/Non-AC)</option>
+                    <option value="AC">AC</option>
+                    <option value="Non-AC">Non-AC</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <button id="searchTrainBtn">Search</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="results-container" id="trainResultsContainer">
+        <h3>Available Trains</h3>
+        <div id="trainList">
+            <p class="no-results" id="initialNoResults">No trains found for your search criteria.</p>
+        </div>
+    </div>
+
+    <footer>
+        &copy; 2025 TravelGo. All rights reserved.
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchTrainBtn = document.getElementById('searchTrainBtn');
+            const trainListDiv = document.getElementById('trainList');
+            const initialNoResults = document.getElementById('initialNoResults');
+
+            // --- IMPORTANT: This static trainsData should be replaced by fetching from your Flask API ---
+            // For now, I'm keeping it as you provided, but in a real application, you'd make an AJAX call.
+            const trainsData = [
+                {"_id": "60a7d9b0e1d2c3f4a5b6c7d0", "name": "Duronto Express", "train_number": "12285", "source": "Hyderabad", "destination": "Delhi", "departure_time": "07:00 AM", "arrival_time": "05:00 AM (next day)", "price": 1800, "date": "2025-06-25", "type": "AC"},
+                {"_id": "60a7d9b0e1d2c3f4a5b6c7d1", "name": "AP Express", "train_number": "12723", "source": "Hyderabad", "destination": "Vijayawada", "departure_time": "09:00 AM", "arrival_time": "03:00 PM", "price": 450, "date": "2025-07-10", "type": "Non-AC"},
+                {"_id": "60a7d9b0e1d2c3f4a5b6c7d2", "name": "Gouthami Express", "train_number": "12737", "source": "Guntur", "destination": "Hyderabad", "departure_time": "08:00 PM", "arrival_time": "06:00 AM (next day)", "price": 600, "date": "2025-07-10", "type": "AC"},
+                {"_id": "60a7d9b0e1d2c3f4a5b6c7d3", "name": "Chennai Express", "train_number": "12839", "source": "Bengaluru", "destination": "Chennai", "departure_time": "10:30 AM", "arrival_time": "05:30 PM", "price": 750, "date": "2025-07-11", "type": "Non-AC"},
+                {"_id": "60a7d9b0e1d2c3f4a5b6c7d4", "name": "Mumbai Mail", "train_number": "12101", "source": "Hyderabad", "destination": "Mumbai", "departure_time": "06:00 PM", "arrival_time": "09:00 AM (next day)", "price": 1200, "date": "2025-07-10", "type": "AC"},
+                {"_id": "60a7d9b0e1d2c3f4a5b6c7d5", "name": "Godavari Express", "train_number": "12720", "source": "Vijayawada", "destination": "Hyderabad", "departure_time": "05:00 PM", "arrival_time": "11:00 PM", "price": 400, "date": "2025-07-10", "type": "Non-AC"},
+            ];
+
+            // Set today's date as default for the date input if not already set by Flask
+            const dateInput = document.getElementById('date');
+            if (!dateInput.value) {
+                const today = new Date();
+                const yyyy = today.getFullYear();
+                const mm = String(today.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+                const dd = String(today.getDate()).padStart(2, '0');
+                dateInput.value = `${yyyy}-${mm}-${dd}`;
+            }
+
+            searchTrainBtn.addEventListener('click', function() {
+                const source = document.getElementById('source').value;
+                const destination = document.getElementById('destination').value;
+                const date = document.getElementById('date').value;
+                const numPersons = document.getElementById('num_persons').value;
+                const trainType = document.getElementById('train_type').value;
+
+                if (!source || !destination || !date || !numPersons) {
+                    alert('Please fill in all search fields.');
+                    return;
+                }
+                if (source === destination) {
+                    alert('Source and destination cannot be the same.');
+                    return;
+                }
+
+                trainListDiv.innerHTML = ''; // Clear previous results
+                
+                // --- THIS SECTION SHOULD BE REPLACED WITH AN AJAX CALL TO YOUR FLASK API ---
+                // Example of how you would fetch from your Flask endpoint:
+                // fetch(`/api/trains_search?source=${source}&destination=${destination}&date=${date}&type=${trainType}`)
+                //     .then(response => response.json())
+                //     .then(filteredTrains => {
+                //         // Your current rendering logic would go here, using filteredTrains
+                //     })
+                //     .catch(error => console.error('Error fetching trains:', error));
+                // --- END OF API CALL SUGGESTION ---
+
+                // Using the static trainsData for now, as per your original script
+                const filteredTrains = trainsData.filter(train => {
+                    const matchesSource = train.source === source;
+                    const matchesDestination = train.destination === destination;
+                    const matchesDate = train.date === date;
+                    const matchesType = (trainType === 'All' || train.type === trainType);
+                    return matchesSource && matchesDestination && matchesDate && matchesType;
+                });
+
+                if (filteredTrains.length > 0) {
+                    initialNoResults.style.display = 'none'; // Hide "No trains found" message
+                    filteredTrains.forEach(train => {
+                        const trainCard = document.createElement('div');
+                        trainCard.classList.add('train-card');
+                        trainCard.innerHTML = `
+                            <div class="train-info">
+                                <h4>${train.name} (${train.train_number})</h4>
+                                <p><strong>From:</strong> ${train.source} <strong>To:</strong> ${train.destination}</p>
+                                <p><strong>Departure:</strong> ${train.departure_time} <strong>Arrival:</strong> ${train.arrival_time}</p>
+                                <p><strong>Type:</strong> ${train.type}</p>
+                            </div>
+                            <div class="train-price-book">
+                                <div class="train-price">₹${train.price.toLocaleString('en-IN')}</div>
+                                <button class="book-btn"
+                                        data-name="${train.name}"
+                                        data-train-number="${train.train_number}"
+                                        data-source="${train.source}"
+                                        data-destination="${train.destination}"
+                                        data-departure-time="${train.departure_time}"
+                                        data-arrival-time="${train.arrival_time}"
+                                        data-price="${train.price}"
+                                        data-date="${train.date}"
+                                        data-type="${train.type}"
+                                        data-num-persons="${numPersons}"
+                                        data-train-id="${train._id}">
+                                    Book Now
+                                </button>
+                            </div>
+                        `;
+                        trainListDiv.appendChild(trainCard);
+                    });
+
+                    // Add event listeners to the new "Book Now" buttons
+                    document.querySelectorAll('.book-btn').forEach(button => {
+                        button.addEventListener('click', function() {
+                            const name = this.dataset.name;
+                            const trainNumber = this.dataset.trainNumber;
+                            const source = this.dataset.source;
+                            const destination = this.dataset.destination;
+                            const departureTime = this.dataset.departureTime;
+                            const arrivalTime = this.dataset.arrivalTime;
+                            const price = this.dataset.price;
+                            const date = this.dataset.date;
+                            const numPersons = this.dataset.numPersons;
+                            const trainId = this.dataset.trainId;
+                            const type = this.dataset.type; // Get train type
+
+                            window.location.href = `/confirm_train_details?name=${name}&trainNumber=${trainNumber}&source=${source}&destination=${destination}&departureTime=${departureTime}&arrivalTime=${arrivalTime}&price=${price}&date=${date}&persons=${numPersons}&trainId=${trainId}&type=${type}`;
+                        });
+                    });
+
+                } else {
+                    initialNoResults.style.display = 'block'; // Show "No trains found" message
+                    trainListDiv.innerHTML = ''; // Ensure list is empty before adding "no results" message
+                    trainListDiv.appendChild(initialNoResults); // Append it to the list div
+                }
+            });
+
+            // Auto-fill and search if redirected with query parameters (e.g., from an error page)
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('source') && urlParams.has('destination') && urlParams.has('date')) {
+                document.getElementById('source').value = urlParams.get('source');
+                document.getElementById('destination').value = urlParams.get('destination');
+                document.getElementById('date').value = urlParams.get('date');
+                document.getElementById('num_persons').value = urlParams.get('num_persons') || '1';
+                document.getElementById('train_type').value = urlParams.get('type') || 'All';
+
+                searchTrainBtn.click(); // Automatically trigger the search
+            }
+        });
+    </script>
+</body>
+</html>

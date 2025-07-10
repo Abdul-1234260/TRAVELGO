@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Search Flights - TravelGo</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        /* Common CSS styles for header, container, form, buttons */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background: #f3f8ff;
+            color: #333;
+        }
+
+        header {
+            background-color: #004aad;
+            color: white;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h1 {
+            font-size: 26px;
+            margin: 0;
+        }
+
+        header nav a {
+            color: white;
+            text-decoration: none;
+            margin-left: 20px;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        header nav a:hover {
+            color: #ffdd57;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 40px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+        }
+
+        h2 {
+            color: #004aad;
+            margin-bottom: 25px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        select, input[type="date"], input[type="number"] {
+            flex: 1 1 160px;
+            padding: 10px;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            font-size: 15px;
+        }
+
+        .search-btn {
+            background-color: #004aad;
+            color: white;
+            padding: 10px 18px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+
+        .search-btn:hover {
+            background-color: #00307c;
+        }
+
+        .filters {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filters label {
+            background: #e6f0ff;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .sort-row {
+            margin-bottom: 20px;
+        }
+
+        .sort-row label {
+            margin-right: 10px;
+            font-weight: 500;
+        }
+
+        .flight-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .flight-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f9fbff;
+            border: 1px solid #dbe7ff;
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+            flex-wrap: wrap; /* Added for responsiveness */
+        }
+
+        .flight-card div {
+            flex-grow: 1;
+            min-width: 150px; /* Added for better layout on smaller screens */
+        }
+
+        .flight-card strong {
+            color: #004aad;
+            font-size: 17px;
+        }
+
+        .book-btn {
+            background: #00a36c;
+            color: white;
+            padding: 8px 14px;
+            font-weight: 500;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .book-btn:hover {
+            background: #008955;
+        }
+        
+        /* Message box styles for consistency */
+        .message-box {
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            display: none; /* Hidden by default */
+        }
+        .message-box.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .message-box.warning {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeeba;
+        }
+        .message-box.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                flex-direction: column;
+            }
+
+            .flight-card {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .book-btn {
+                margin-top: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+<header>
+    <h1>TravelGo</h1>
+    <nav>
+        <a href="/">Home</a>
+        <a href="/dashboard">Dashboard</a>
+        <a href="/logout">Logout</a>
+    </nav>
+</header>
+
+<div class="container">
+    <h2>✈️ Search & Book Flights</h2>
+    <div id="messageBox" class="message-box" role="alert"></div>
+
+    <div class="form-row">
+        <select id="source">
+            <option value="">From</option>
+            <option value="Hyderabad">Hyderabad (HYD)</option>
+            <option value="Bengaluru">Bengaluru (BLR)</option>
+            <option value="Chennai">Chennai (MAA)</option>
+            <option value="Mumbai">Mumbai (BOM)</option>
+            <option value="Delhi">Delhi (DEL)</option>
+        </select>
+
+        <select id="destination">
+            <option value="">To</option>
+            <option value="Hyderabad">Hyderabad (HYD)</option>
+            <option value="Bengaluru">Bengaluru (BLR)</option>
+            <option value="Chennai">Chennai (MAA)</option>
+            <option value="Mumbai">Mumbai (BOM)</option>
+            <option value="Delhi">Delhi (DEL)</option>
+        </select>
+
+        <input type="date" id="date" />
+        <input type="number" id="numPersons" min="1" value="1" placeholder="No. of Persons" />
+        <button id="search-btn" class="search-btn">Search</button>
+    </div>
+
+    <div class="filters">
+        <label><input type="checkbox" id="direct" /> Direct</label>
+        <label><input type="checkbox" id="oneStop" /> 1 Stop</label>
+        <label><input type="checkbox" id="twoStops" /> 2+ Stops</label>
+        <label><input type="checkbox" id="economy" /> Economy</label>
+        <label><input type="checkbox" id="business" /> Business</label>
+    </div>
+
+    <div class="sort-row">
+        <label for="sort">Sort by Price:</label>
+        <select id="sort">
+            <option value="">None</option>
+            <option value="low">Low to High</option>
+            <option value="high">High to Low</option>
+        </select>
+    </div>
+
+    <div id="flight-list" class="flight-list"></div>
+</div>
+
+<script>
+    // Custom message box function
+    function showMessage(message, type = 'error', targetId = 'messageBox') {
+        const messageBox = document.getElementById(targetId);
+        messageBox.textContent = message;
+        messageBox.className = `message-box ${type}`;
+        messageBox.style.display = 'block';
+        setTimeout(() => {
+            messageBox.style.display = 'none';
+        }, 3000);
+    }
+
+    // Hardcoded flights data (as requested)
+    const flights = [
+        { flight_id: "FLT001", airline: "IndiGo", flight_number: "6E 234", source: "Hyderabad", destination: "Mumbai", departure_time: "08:00 AM", arrival_time: "09:30 AM", duration: "1h 30m", type: "Direct Economy", price_economy: 3500, price_business: null },
+        { flight_id: "FLT002", airline: "Vistara", flight_number: "UK 876", source: "Hyderabad", destination: "Mumbai", departure_time: "10:00 AM", arrival_time: "11:45 AM", duration: "1h 45m", type: "Direct Business", price_economy: null, price_business: 7800 },
+        { flight_id: "FLT003", airline: "Air India", flight_number: "AI 543", source: "Bengaluru", destination: "Delhi", departure_time: "12:00 PM", arrival_time: "02:50 PM", duration: "2h 50m", type: "1-Stop Economy", price_economy: 4500, price_business: null },
+        { flight_id: "FLT004", airline: "SpiceJet", flight_number: "SG 123", source: "Chennai", destination: "Hyderabad", departure_time: "06:00 AM", arrival_time: "07:20 AM", duration: "1h 20m", type: "Direct Economy", price_economy: 2800, price_business: null },
+        { flight_id: "FLT005", airline: "Akasa Air", flight_number: "QP 456", source: "Mumbai", destination: "Bengaluru", departure_time: "09:00 PM", arrival_time: "10:30 PM", duration: "1h 30m", type: "Direct Economy", price_economy: 3200, price_business: null },
+        { flight_id: "FLT006", airline: "GoFirst", flight_number: "G8 789", source: "Delhi", destination: "Hyderabad", departure_time: "07:00 AM", arrival_time: "09:00 AM", duration: "2h 00m", type: "2-Stops Business", price_economy: null, price_business: 3900 },
+        { flight_id: "FLT007", airline: "IndiGo", flight_number: "6E 500", source: "Hyderabad", destination: "Bengaluru", departure_time: "10:00", arrival_time: "11:30", duration: "1h 30m", type: "Direct Economy", price_economy: 2600, price_business: 4600 },
+        { flight_id: "FLT008", airline: "IndiGo", flight_number: "6E 2345", source: "Hyderabad", destination: "Bengaluru", departure_time: "14:30", arrival_time: "16:00", duration: "1h 30m", type: "Direct Economy", price_economy: 2500, price_business: 4500 },
+        { flight_id: "FLT009", airline: "Vistara", flight_number: "UK 876", source: "Bengaluru", destination: "Mumbai", departure_time: "09:00", arrival_time: "10:45", duration: "1h 45m", type: "Direct Business", price_economy: 3200, price_business: 5800 },
+        { flight_id: "FLT010", airline: "Air India", flight_number: "AI 501", source: "Delhi", destination: "Hyderabad", departure_time: "18:00", arrival_time: "20:15", duration: "2h 15m", type: "Direct Economy", price_economy: 4000, price_business: 7000 },
+        { flight_id: "FLT011", airline: "SpiceJet", flight_number: "SG 123", source: "Hyderabad", destination: "Chennai", departure_time: "07:00", arrival_time: "08:10", duration: "1h 10m", type: "Direct Economy", price_economy: 2800, price_business: 5000 },
+        { flight_id: "FLT012", airline: "IndiGo", flight_number: "6E 789", source: "Chennai", destination: "Hyderabad", departure_time: "10:00", arrival_time: "11:10", duration: "1h 10m", type: "Direct Economy", price_economy: 2700, price_business: 4800 },
+    ];
+
+
+    function filterFlights() {
+        const source = document.getElementById("source").value;
+        const destination = document.getElementById("destination").value;
+        const date = document.getElementById("date").value; // This date will be part of booking data
+        const numPersons = parseInt(document.getElementById("numPersons").value);
+        const sort = document.getElementById("sort").value;
+        const list = document.getElementById("flight-list");
+        list.innerHTML = ""; // Clear previous results
+
+        if (!source || !destination || !date || numPersons < 1) {
+            showMessage('Please select **Source**, **Destination**, **Date**, and **Number of Persons** to search.', 'warning');
+            return;
+        }
+
+        if (source === destination) {
+            showMessage("Source and destination cannot be the same.", 'warning');
+            return;
+        }
+
+        const filters = {
+            direct: document.getElementById("direct").checked,
+            oneStop: document.getElementById("oneStop").checked,
+            twoStops: document.getElementById("twoStops").checked,
+            economy: document.getElementById("economy").checked,
+            business: document.getElementById("business").checked,
+        };
+
+        let filtered = flights.filter(f => {
+            // Check route match first
+            if (f.source !== source || f.destination !== destination) return false;
+
+            const flightTypeLower = f.type.toLowerCase();
+
+            // Check stop type filter
+            const noStopFiltersSelected = !filters.direct && !filters.oneStop && !filters.twoStops;
+            let stopMatch = noStopFiltersSelected;
+            if (filters.direct && flightTypeLower.includes("direct")) stopMatch = true;
+            if (filters.oneStop && flightTypeLower.includes("1-stop")) stopMatch = true;
+            if (filters.twoStops && flightTypeLower.includes("2-stops")) stopMatch = true;
+            if (!stopMatch && !noStopFiltersSelected) return false; // If stop filter is active and no match
+
+            // Check class filter
+            const noClassFiltersSelected = !filters.economy && !filters.business;
+            let classMatch = noClassFiltersSelected;
+            if (filters.economy && flightTypeLower.includes("economy")) classMatch = true;
+            if (filters.business && flightTypeLower.includes("business")) classMatch = true;
+            if (!classMatch && !noClassFiltersSelected) return false; // If class filter is active and no match
+
+            return true; // If all checks pass
+        });
+
+        // Apply sorting
+        if (sort === "low") {
+            filtered.sort((a, b) => {
+                const priceA = a.price_economy || a.price_business; // Use first available price
+                const priceB = b.price_economy || b.price_business;
+                return priceA - priceB;
+            });
+        } else if (sort === "high") {
+            filtered.sort((a, b) => {
+                const priceA = a.price_economy || a.price_business;
+                const priceB = b.price_economy || b.price_business;
+                return priceB - priceA;
+            });
+        }
+
+
+        if (filtered.length === 0) {
+            list.innerHTML = "<p>No flights found for this route and filters.</p>";
+            return;
+        }
+
+        filtered.forEach(flight => {
+            const card = document.createElement("div");
+            card.className = "flight-card";
+            
+            // Determine which price/class to display
+            let displayPrice = 0;
+            let displayClass = "";
+            if (filters.business && flight.price_business !== null) {
+                displayPrice = flight.price_business;
+                displayClass = "Business";
+            } else if (flight.price_economy !== null) { // Default to economy if no business or business not filtered
+                displayPrice = flight.price_economy;
+                displayClass = "Economy";
+            } else if (flight.price_business !== null) { // Fallback if only business available
+                displayPrice = flight.price_business;
+                displayClass = "Business";
+            }
+
+
+            card.innerHTML = `
+                <div>
+                    <strong>${flight.airline} (${flight.flight_number})</strong><br>
+                    ${flight.type} • ${flight.departure_time} - ${flight.arrivalTime} • ${flight.duration}
+                    <br>
+                    Price: ₹${displayPrice} (${displayClass})
+                </div>
+                <button class="book-btn" 
+                    data-flight-id="${flight.flight_id}"
+                    data-airline="${flight.airline}"
+                    data-flight-number="${flight.flight_number}"
+                    data-source="${flight.source}"
+                    data-destination="${flight.destination}"
+                    data-departure-time="${flight.departure_time}"
+                    data-arrival-time="${flight.arrivalTime}"
+                    data-duration="${flight.duration}"
+                    data-type="${flight.type}"
+                    data-price-economy="${flight.price_economy}"
+                    data-price-business="${flight.price_business}"
+                    data-travel-date="${date}"
+                    data-num-persons="${numPersons}"
+                    data-display-price="${displayPrice}"
+                    data-display-class="${displayClass}"
+                    onclick="bookFlight(this)">
+                    Book Now
+                </button>
+            `;
+            list.appendChild(card);
+        });
+    }
+
+    async function bookFlight(buttonElement) {
+        const data = buttonElement.dataset;
+        const flightId = data.flightId;
+        const airline = data.airline;
+        const flightNumber = data.flightNumber;
+        const source = data.source;
+        const destination = data.destination;
+        const departureTime = data.departureTime;
+        const arrivalTime = data.arrivalTime;
+        const duration = data.duration;
+        const type = data.type;
+        const priceEconomy = data.priceEconomy;
+        const priceBusiness = data.priceBusiness;
+        const travelDate = data.travelDate;
+        const numPersons = parseInt(data.numPersons);
+        const displayPrice = parseFloat(data.displayPrice); // The price currently shown
+        const displayClass = data.displayClass; // The class currently shown
+
+        if (!confirm(`Confirm booking for ${airline} (${flightNumber}) from ${source} to ${destination} on ${travelDate} for ${numPersons} person(s) at ₹${displayPrice * numPersons} (Total)?`)) {
+            return;
+        }
+
+        const bookingData = {
+            flight_id: flightId, // Using the simple string ID for now
+            airline: airline,
+            flight_number: flightNumber,
+            source: source,
+            destination: destination,
+            departure_time: departureTime,
+            arrival_time: arrivalTime,
+            duration: duration,
+            type: type,
+            price_per_person: displayPrice, // Use the price chosen by filters
+            total_price: displayPrice * numPersons, // Calculated total
+            travel_date: travelDate,
+            num_persons: numPersons,
+            booking_type: 'flight' // Explicitly set booking type
+        };
+
+        try {
+            const response = await fetch('/book_flight_direct', { // New endpoint for direct booking
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(bookingData)
+            });
+            const result = await response.json();
+            showMessage(result.message, result.success ? 'success' : 'error');
+            if (result.success) {
+                setTimeout(() => { window.location.href = result.redirect || '/dashboard'; }, 1500);
+            }
+        } catch (err) {
+            console.error('Error during direct flight booking:', err);
+            showMessage('Error during booking. Please try again.', 'error');
+        }
+    }
+
+    document.getElementById("search-btn").addEventListener("click", filterFlights);
+    document.getElementById("sort").addEventListener("change", filterFlights);
+    // Add event listeners for all filter checkboxes
+    ['direct', 'oneStop', 'twoStops', 'economy', 'business'].forEach(id =>
+        document.getElementById(id).addEventListener("change", filterFlights)
+    );
+
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('date').value = today;
+        // Optionally, call filterFlights on page load to show initial results
+        // filterFlights(); 
+    });
+</script>
+</body>
+</html>
