@@ -518,39 +518,3 @@ def cancel_booking():
 if __name__ == '__main__':
     # IMPORTANT: In a production environment, disable debug mode and specify a production-ready host.
     app.run(debug=True, host='0.0.0.0')
-
-
-
-
-
-
-
-
-Commands
-
-Commands to use while hosting in AWS ec2
-
-sudo yum install git -y
-
-git clone you_github_repository
-
-cd your_repository_name
-
-sudo yum install python3 -y
-
-sudo yum install python3-pip -y
-
-pip install flask
-
-pip install boto3
-
-python3 app.py
-
-
-Common error
-
--> after uploading/pushing your code into git repository please check 
-app = Flask(__name__) this line in app.py code, double underscores should present before & after name
-
--> warning secrets are allowed by git hub
-Then : simply select false positive option in that
